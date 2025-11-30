@@ -63,19 +63,31 @@ async function run() {
 
    app.get('/myconnection',async(req,res)=>{
     const email = req.query.email;
+    
     const query={}
     if(email){
       query.myEmail=email;
     }
+   
+    
     const cursor = myConnectionsCollection.find(query)
     const result = await cursor.toArray()
     res.send(result)
    })
 
-   app.post('/myconnection',async(req,res)=>{
+   app.post('/myconnection/:id',async(req,res)=>{
       const partner = req.body;
+      const id = req.params.id;
+      const query = {_id:new ObjectId(id)}
+       const update = {
+      $inc:{
+       
+        patnerCount:1
+      }
+    }
+    const patnerCount =await allpartnersCollection.updateOne(query,update)
       const result = await myConnectionsCollection.insertOne(partner)
-      res.send(result)
+      res.send(result,patnerCount)
     })
 
     app.delete('/myconnection/:id',async(req,res)=>{
